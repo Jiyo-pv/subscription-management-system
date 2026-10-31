@@ -1,0 +1,21 @@
+<!-- Shared sidebar for catalog/subscription dashboard pages -->
+<aside class="fixed inset-y-0 left-0 z-40 hidden w-72 flex-col border-r border-slate-200 bg-white px-5 pb-6 pt-24 shadow-2xl lg:sticky lg:top-0 lg:flex lg:h-screen lg:pt-8 lg:shadow-none">
+    <div class="mb-8 flex items-center justify-between px-3"><span class="text-xs font-bold uppercase tracking-[.16em] text-slate-400">Workspace</span></div>
+    <nav class="space-y-1 text-sm font-semibold">
+        <a href="{% if user.role == 'admin' %}{% url 'admin_dashboard' %}{% else %}{% url 'home' %}{% endif %}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 {% if active == 'dashboard' %}bg-brand-50 text-brand-700{% else %}text-slate-600 transition hover:bg-slate-50 hover:text-ink{% endif %}"><span class="text-base">⌂</span>Dashboard</a>
+        {% if user.role == 'admin' %}<a href="{% url 'customer_list' %}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 {% if active == 'customers' %}bg-brand-50 text-brand-700{% else %}text-slate-600 transition hover:bg-slate-50 hover:text-ink{% endif %}"><span>♙</span>Customers</a>{% endif %}
+        {% if user.role == 'admin' %}<a href="{% url 'create_staff' %}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-slate-600 transition hover:bg-slate-50 hover:text-ink"><span>♧</span>Staff</a>{% endif %}
+        <div class="px-3 pb-2 pt-7 text-[10px] font-bold uppercase tracking-[.16em] text-slate-400">Billing</div>
+        <a href="{% url 'product_list' %}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 {% if active == 'products' %}bg-brand-50 text-brand-700{% else %}text-slate-600 transition hover:bg-slate-50 hover:text-ink{% endif %}"><span>▣</span>Products</a>
+        <a href="{% url 'plan_list' %}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 {% if active == 'plans' %}bg-brand-50 text-brand-700{% else %}text-slate-600 transition hover:bg-slate-50 hover:text-ink{% endif %}"><span>◈</span>Plans</a>
+        <a href="{% url 'subscription_list' %}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 {% if active == 'subscriptions' %}bg-brand-50 text-brand-700{% else %}text-slate-600 transition hover:bg-slate-50 hover:text-ink{% endif %}"><span>◇</span>Subscriptions</a>
+        <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-slate-600 transition hover:bg-slate-50 hover:text-ink"><span>▤</span>Invoices</a>
+        <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-slate-600 transition hover:bg-slate-50 hover:text-ink"><span>⇄</span>Payments</a>
+        {% if user.role == 'admin' %}
+        <div class="px-3 pb-2 pt-7 text-[10px] font-bold uppercase tracking-[.16em] text-slate-400">Configuration</div>
+        <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-slate-600 transition hover:bg-slate-50 hover:text-ink"><span>⊙</span>Taxes</a>
+        <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-slate-600 transition hover:bg-slate-50 hover:text-ink"><span>⌁</span>Discounts</a>
+        {% endif %}
+    </nav>
+    <div class="mt-auto border-t border-slate-100 pt-4"><a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"><span>⚙</span>Profile</a><a href="{% url 'logout' %}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"><span>↪</span>Log out</a></div>
+</aside>

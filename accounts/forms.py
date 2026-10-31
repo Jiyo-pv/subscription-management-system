@@ -71,3 +71,29 @@ class StaffCreationForm(forms.ModelForm):
             user.save()
 
         return user
+
+
+class ProductOwnerCreationForm(StaffCreationForm):
+    class Meta(StaffCreationForm.Meta):
+        fields = ['name', 'email', 'phone', 'company']
+
+    def save(self, commit=True):
+        user = super(StaffCreationForm, self).save(commit=False)
+        user.role = 'product_owner'
+        user.set_password(self.cleaned_data['password1'])
+        if commit:
+            user.save()
+        return user
+
+
+class CustomerProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['name', 'email', 'phone', 'company']
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        existing = User.objects.filter(email__iexact=email).exclude(pk=self.instance.pk)
+        if existing.exists():
+            raise forms.ValidationError('An account with this email already exists.')
+        return email
