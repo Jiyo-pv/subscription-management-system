@@ -60,14 +60,3 @@ def _get_invoice_for_user(user, pk):
 def invoice_detail(request, pk):
     return render(request, 'billing/invoice_detail.html', {'invoice': _get_invoice_for_user(request.user, pk), 'active': 'invoices'})
 
-
-@role_required('admin', 'staff')
-def invoice_mark_paid(request, pk):
-    invoice = get_object_or_404(Invoice, pk=pk)
-    if request.method == 'POST':
-        try:
-            invoice.mark_paid()
-            messages.success(request, f'{invoice.invoice_number} marked paid.')
-        except ValueError as error:
-            messages.error(request, str(error))
-    return redirect('invoice_detail', pk=pk)

@@ -40,18 +40,14 @@ class InvoiceFlowTests(TestCase):
         self.client.force_login(self.other_customer)
         self.assertEqual(self.client.get(reverse('invoice_detail', args=[invoice.pk])).status_code, 404)
 
-    def test_staff_can_create_and_mark_invoice_paid(self):
+    def test_staff_can_create_an_invoice(self):
         self.client.force_login(self.staff)
         due_date = timezone.localdate() + timedelta(days=10)
         response = self.client.post(reverse('invoice_create', args=[self.subscription.pk]), {'due_date': due_date, 'notes': 'Thank you.'})
         invoice = Invoice.objects.get(subscription=self.subscription)
         self.assertRedirects(response, reverse('invoice_detail', args=[invoice.pk]))
         self.assertEqual(invoice.notes, 'Thank you.')
-        response = self.client.post(reverse('invoice_mark_paid', args=[invoice.pk]))
-        self.assertRedirects(response, reverse('invoice_detail', args=[invoice.pk]))
-        invoice.refresh_from_db()
-        self.assertEqual(invoice.status, Invoice.PAID)
-        self.assertIsNotNone(invoice.paid_at)
+        self.assertEqual(invoice.status, Invoice.OPEN)
 
     def test_activation_creates_the_first_invoice(self):
         self.subscription.status = 'confirmed'
