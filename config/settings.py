@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'simple_history',
 
       'accounts',
-      
+      'catalog',
+      'subscriptions',
 ]
 
 MIDDLEWARE = [
