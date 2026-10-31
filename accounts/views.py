@@ -48,3 +48,10 @@ def logout_view(request):
 
 def home(request):
     return render(request, 'accounts/home.html')
+from django.http import HttpResponse
+from .decorators import role_required
+
+
+@role_required('admin')
+def admin_test(request):
+    return HttpResponse("You are an ADMIN!")
