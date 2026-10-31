@@ -5,6 +5,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponse, JsonResponse
 from django.core.paginator import Paginator
 from django.db.models import Count, Q, Sum
+from django.db import IntegrityError, transaction
 from django.utils import timezone
 import time
 from .forms import SignupForm, StaffCreationForm, ProductOwnerCreationForm, CustomerProfileForm
@@ -22,8 +23,16 @@ def signup(request):
         form = SignupForm(request.POST)
 
         if form.is_valid():
-            form.save()
-            return redirect('login')
+            try:
+                # The form handles ordinary duplicates; this also protects
+                # simultaneous requests that pass validation at the same time.
+                with transaction.atomic():
+                    form.save()
+            except IntegrityError:
+                form.add_error('email', 'An account with this email already exists.')
+            else:
+                messages.success(request, 'Account created. You can now log in.')
+                return redirect('login')
 
     else:
         form = SignupForm()

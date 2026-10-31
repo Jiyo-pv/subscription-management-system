@@ -23,6 +23,17 @@ class AdminDashboardTests(TestCase):
         self.client.force_login(self.admin)
         self.assertEqual(self.client.get(reverse('admin_dashboard')).status_code, 200)
 
+    def test_signup_duplicate_email_shows_a_form_error_not_a_server_error(self):
+        User.objects.create_user('existing@example.com', 'Strong-pass-123', name='Existing', role='customer')
+        response = self.client.post(reverse('signup'), {
+            'name': 'New Person', 'email': 'EXISTING@example.com',
+            'phone': '', 'company': '',
+            'password1': 'Strong-pass-123', 'password2': 'Strong-pass-123',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'An account with this email already exists.')
+        self.assertEqual(User.objects.filter(email__iexact='existing@example.com').count(), 1)
+
     def test_dashboard_statistics_come_from_database(self):
         product = Product.objects.create(name='Live product', sales_price=Decimal('10.00'))
         plan = Plan.objects.create(name='Live plan', product=product, price=Decimal('12.00'))
