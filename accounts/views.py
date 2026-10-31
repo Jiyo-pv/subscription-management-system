@@ -330,9 +330,11 @@ def customer_profile(request):
 
 @role_required('customer')
 def customer_invoices(request):
-    # No Invoice model or payments app exists in this project yet. Keep this
-    # route available without inventing invoice data or exposing another user's records.
-    return render(request, 'accounts/customer_invoices.html', {
-        'invoices': [],
+    from billing.models import Invoice
+    invoices = Invoice.objects.filter(customer=request.user).select_related(
+        'subscription', 'subscription__plan', 'subscription__plan__product'
+    )
+    return render(request, 'billing/customer_invoice_list.html', {
+        'invoices': invoices,
         'active': 'invoices',
     })
