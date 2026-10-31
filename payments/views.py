@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 
 from accounts.decorators import role_required
@@ -17,7 +18,7 @@ def payment_create(request, invoice_pk):
     if request.method == 'POST' and form.is_valid():
         try:
             record_payment(invoice, recorded_by=request.user, **form.cleaned_data)
-        except Exception as error:
+        except ValidationError as error:
             form.add_error(None, error)
         else:
             messages.success(request, 'Payment recorded.')

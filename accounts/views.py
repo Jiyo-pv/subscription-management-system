@@ -137,6 +137,7 @@ def admin_dashboard(request):
     from catalog.models import Plan, Product
     from subscriptions.models import Subscription
     from billing.models import Invoice
+    from payments.models import DailyMetricSnapshot
 
     subscription_counts = Subscription.objects.aggregate(
         total=Count('id'),
@@ -163,6 +164,14 @@ def admin_dashboard(request):
         'outstanding': Invoice.objects.filter(status='open').aggregate(total=Sum('total_amount'))['total'] or 0,
         'overdue': Invoice.objects.filter(status='open', due_date__lt=timezone.localdate()).aggregate(total=Sum('total_amount'))['total'] or 0,
     }
+    metrics_snapshot = DailyMetricSnapshot.objects.order_by('-snapshot_date').first()
+    if metrics_snapshot:
+        stats.update({
+            'subscriptions_active': metrics_snapshot.active_subscriptions,
+            'revenue': metrics_snapshot.revenue,
+            'outstanding': metrics_snapshot.outstanding,
+            'overdue': metrics_snapshot.overdue,
+        })
     recent_subscriptions = Subscription.objects.select_related(
         'customer', 'plan'
     ).order_by('-created_at')[:8]
@@ -201,6 +210,7 @@ def admin_dashboard(request):
         'recent_products': recent_products,
         'recent_product_owners': recent_product_owners,
         'platform_activity': activity[:12],
+        'metrics_snapshot': metrics_snapshot,
         'active': 'dashboard',
     })
 

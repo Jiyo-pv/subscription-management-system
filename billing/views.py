@@ -1,7 +1,9 @@
 from django.contrib import messages
 from django.core.paginator import Paginator
+from django.db import models
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
 from accounts.decorators import role_required
 from subscriptions.models import Subscription
@@ -24,10 +26,21 @@ def invoice_list(request):
     status = request.GET.get('status', '')
     if status in dict(Invoice.STATUS_CHOICES):
         invoices = invoices.filter(status=status)
+    if request.GET.get('outstanding') == '1':
+        invoices = invoices.filter(status=Invoice.OPEN, amount_paid__lt=models.F('total_amount'))
+    if request.GET.get('overdue') == '1':
+        invoices = invoices.filter(
+            status=Invoice.OPEN,
+            due_date__lt=timezone.localdate(),
+            amount_paid__lt=models.F('total_amount'),
+        )
     page_obj = Paginator(invoices, 25).get_page(request.GET.get('page'))
     return render(request, 'billing/invoice_list.html', {
         'invoices': page_obj.object_list, 'page_obj': page_obj,
-        'status_choices': Invoice.STATUS_CHOICES, 'current_status': status, 'active': 'invoices',
+        'status_choices': Invoice.STATUS_CHOICES, 'current_status': status,
+        'outstanding_only': request.GET.get('outstanding') == '1',
+        'overdue_only': request.GET.get('overdue') == '1',
+        'active': 'invoices',
     })
 
 
@@ -59,4 +72,3 @@ def _get_invoice_for_user(user, pk):
 @role_required('admin', 'staff', 'product_owner', 'customer')
 def invoice_detail(request, pk):
     return render(request, 'billing/invoice_detail.html', {'invoice': _get_invoice_for_user(request.user, pk), 'active': 'invoices'})
-

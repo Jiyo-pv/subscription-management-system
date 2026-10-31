@@ -26,6 +26,27 @@ Brightloop provides a unified system that helps businesses:
 - Maintain audit history for important business records
 - Monitor business performance through dashboards
 
+## Billing data and dashboard operations
+
+Member 4's payment tooling is available through the following management commands:
+
+```powershell
+# Load a small local dataset, or use the default 5,000 records for a load test.
+python manage.py seed_billing_data --count 5000 --batch-size 500
+
+# Refresh the aggregate snapshot used by the finance dashboard.
+python manage.py refresh_metrics
+```
+
+The seed command creates customers, active subscriptions, invoices, and partial
+or completed payments using bulk inserts. Seed accounts use the password
+`SeedData-Only-123!` and `@example.test` email addresses; do not use this
+dataset in a production environment.
+
+Invoice lists support `?outstanding=1` and `?overdue=1` filters. Payment records
+are created through the row-locked `record_payment` service, which rejects
+overpayments and marks an invoice paid only when its balance reaches zero.
+
 The platform is designed with reliability, security, and scalability in mind.
 
 ---

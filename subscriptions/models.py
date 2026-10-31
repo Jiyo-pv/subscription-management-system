@@ -86,6 +86,11 @@ class Subscription(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['status']),
+            models.Index(fields=['next_billing_date']),
+            models.Index(fields=['status', 'next_billing_date']),
+        ]
 
     def __str__(self):
         return f"{self.subscription_number} – {self.customer}"

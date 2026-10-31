@@ -22,5 +22,29 @@ class Payment(models.Model):
 
     history = HistoricalRecords()
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['invoice', 'payment_date']),
+            models.Index(fields=['payment_date']),
+        ]
+
     def __str__(self):
         return f'{self.invoice} – {self.amount}'
+
+
+class DailyMetricSnapshot(models.Model):
+    snapshot_date = models.DateField(unique=True)
+    active_subscriptions = models.PositiveIntegerField(default=0)
+    revenue = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    outstanding = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    overdue = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    overdue_invoice_count = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-snapshot_date']
+        indexes = [models.Index(fields=['-snapshot_date'])]
+
+    def __str__(self):
+        return f'Metrics for {self.snapshot_date}'
