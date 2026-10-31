@@ -1,0 +1,5 @@
+{% extends "accounts/base.html" %}
+{% block title %}Create invoice | Brightloop{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-xl px-5 py-12"><a class="text-sm font-semibold text-brand-600" href="{% url 'subscription_detail' subscription.pk %}">← Back to subscription</a><div class="mt-5 rounded-2xl border bg-white p-7 shadow-card"><p class="text-sm font-bold uppercase tracking-wider text-brand-600">Billing</p><h1 class="mt-1 text-3xl font-extrabold text-ink">Create invoice</h1><p class="mt-3 text-sm text-slate-500">{{ subscription.subscription_number }} · {{ subscription.customer.name }} · {{ subscription.plan.name }}</p><form method="post" class="mt-6">{% csrf_token %}{{ form.as_p }}<button class="rounded-xl bg-ink px-5 py-3 text-sm font-semibold text-white">Create invoice</button></form></div></section>
+{% endblock %}

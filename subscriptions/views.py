@@ -158,7 +158,9 @@ def subscription_activate(request, pk):
         try:
             with transaction.atomic():
                 subscription.transition_to('active')
-            messages.success(request, 'Subscription activated.')
+                from billing.services import create_invoice_for_subscription
+                create_invoice_for_subscription(subscription)
+            messages.success(request, 'Subscription activated and its first invoice was created.')
         except ValueError as e:
             messages.error(request, str(e))
 
