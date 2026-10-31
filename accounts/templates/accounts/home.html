@@ -1,26 +1,54 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Brightloop</title>
-</head>
-
-<body>
-
-<h1>Brightloop Subscription Management</h1>
-
+{% extends "accounts/base.html" %}
+{% block title %}{% if user.is_authenticated %}Dashboard | Brightloop{% else %}Brightloop | Subscription operations, simplified{% endif %}{% endblock %}
+{% block content %}
 {% if user.is_authenticated %}
-
-    <p>Welcome, {{ user.name }}!</p>
-    <p>Role: {{ user.role }}</p>
-
-    <a href="{% url 'logout' %}">Logout</a>
-
+<div class="mx-auto flex max-w-[1440px] gap-0 lg:px-6">
+    <aside id="dashboard-sidebar" data-mobile-menu class="fixed inset-y-0 left-0 z-40 hidden w-72 flex-col border-r border-slate-200 bg-white px-5 pb-6 pt-24 shadow-2xl lg:sticky lg:top-0 lg:flex lg:h-screen lg:pt-8 lg:shadow-none">
+        <div class="mb-8 flex items-center justify-between px-3"><span class="text-xs font-bold uppercase tracking-[.16em] text-slate-400">Workspace</span><button type="button" class="text-slate-400 lg:hidden" aria-label="Close navigation">×</button></div>
+        <nav class="space-y-1 text-sm font-semibold">
+            <a href="{% url 'home' %}" class="flex items-center gap-3 rounded-xl bg-brand-50 px-3 py-2.5 text-brand-700"><span class="text-base">⌂</span>Dashboard</a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-slate-600 transition hover:bg-slate-50 hover:text-ink"><span>♙</span>Customers</a>
+            {% if user.role == 'admin' %}<a href="{% url 'create_staff' %}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-slate-600 transition hover:bg-slate-50 hover:text-ink"><span>♧</span>Staff</a>{% endif %}
+            <div class="px-3 pb-2 pt-7 text-[10px] font-bold uppercase tracking-[.16em] text-slate-400">Billing</div>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-slate-600 transition hover:bg-slate-50 hover:text-ink"><span>▣</span>Products</a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-slate-600 transition hover:bg-slate-50 hover:text-ink"><span>◈</span>Plans</a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-slate-600 transition hover:bg-slate-50 hover:text-ink"><span>◇</span>Subscriptions</a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-slate-600 transition hover:bg-slate-50 hover:text-ink"><span>▤</span>Invoices</a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-slate-600 transition hover:bg-slate-50 hover:text-ink"><span>⇄</span>Payments</a>
+            {% if user.role == 'admin' %}
+            <div class="px-3 pb-2 pt-7 text-[10px] font-bold uppercase tracking-[.16em] text-slate-400">Configuration</div>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-slate-600 transition hover:bg-slate-50 hover:text-ink"><span>⊙</span>Taxes</a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-slate-600 transition hover:bg-slate-50 hover:text-ink"><span>⌁</span>Discounts</a>
+            {% endif %}
+        </nav>
+        <div class="mt-auto border-t border-slate-100 pt-4"><a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"><span>⚙</span>Profile</a><a href="{% url 'logout' %}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"><span>↪</span>Log out</a></div>
+    </aside>
+    <div class="min-w-0 flex-1 px-5 py-8 lg:px-8 lg:py-10">
+        <div class="mb-8 flex items-start justify-between gap-5">
+            <div><div class="mb-4 flex items-center gap-3 lg:hidden"><button data-menu-button type="button" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm">☰ Menu</button><span class="text-sm font-semibold text-slate-500">Workspace</span></div><p class="text-sm font-semibold text-brand-600">Overview</p><h1 class="mt-1 text-3xl font-bold tracking-tight text-ink">Good morning, {{ user.name }}.</h1><p class="mt-2 text-sm text-slate-500">Here’s what’s happening with your subscription business.</p></div>
+            <div class="hidden items-center gap-3 sm:flex"><button class="rounded-xl border border-slate-200 bg-white p-2.5 text-slate-500 shadow-sm hover:bg-slate-50" aria-label="Notifications">♢</button><span class="rounded-full bg-ink px-3 py-2 text-xs font-bold uppercase tracking-wide text-white">{{ user.role }}</span></div>
+        </div>
+        <div class="mb-8 flex gap-2 overflow-x-auto border-b border-slate-200 pb-3 text-sm font-semibold text-slate-500"><span class="whitespace-nowrap border-b-2 border-brand-600 pb-3 text-brand-700">Overview</span><span class="whitespace-nowrap pb-3">Activity</span><span class="whitespace-nowrap pb-3">Reports</span></div>
+        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-soft"><div class="flex items-center justify-between"><span class="text-sm font-medium text-slate-500">Active subscriptions</span><span class="rounded-lg bg-brand-50 p-2 text-brand-600">↻</span></div><div class="mt-5 text-3xl font-bold text-ink">0</div><p class="mt-2 text-xs font-semibold text-slate-400">No data yet</p></div>
+            <div class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-soft"><div class="flex items-center justify-between"><span class="text-sm font-medium text-slate-500">Revenue</span><span class="rounded-lg bg-emerald-50 p-2 text-emerald-600">↗</span></div><div class="mt-5 text-3xl font-bold text-ink">$0.00</div><p class="mt-2 text-xs font-semibold text-slate-400">No billing data yet</p></div>
+            <div class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-soft"><div class="flex items-center justify-between"><span class="text-sm font-medium text-slate-500">Outstanding</span><span class="rounded-lg bg-amber-50 p-2 text-amber-600">◷</span></div><div class="mt-5 text-3xl font-bold text-ink">$0.00</div><p class="mt-2 text-xs font-semibold text-slate-400">Nothing outstanding</p></div>
+            <div class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-soft"><div class="flex items-center justify-between"><span class="text-sm font-medium text-slate-500">Overdue</span><span class="rounded-lg bg-rose-50 p-2 text-rose-600">!</span></div><div class="mt-5 text-3xl font-bold text-ink">$0.00</div><p class="mt-2 text-xs font-semibold text-slate-400">All caught up</p></div>
+        </div>
+        <div class="mt-6 grid gap-6 xl:grid-cols-[1.4fr_.6fr]">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-card"><div class="flex items-center justify-between"><div><h2 class="font-display font-bold text-ink">Revenue overview</h2><p class="mt-1 text-sm text-slate-500">Your revenue performance will appear here.</p></div><span class="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-500">Last 30 days</span></div><div class="mt-8 flex h-48 items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-400">Connect billing data to see your revenue trend</div></div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-card"><h2 class="font-display font-bold text-ink">Quick actions</h2><div class="mt-5 space-y-3"><a href="{% url 'create_staff' %}" class="{% if user.role != 'admin' %}hidden{% endif %} flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-brand-50 hover:text-brand-700"><span>Add team member</span><span>→</span></a><a href="#" class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-brand-50 hover:text-brand-700"><span>Create an invoice</span><span>→</span></a><a href="#" class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-brand-50 hover:text-brand-700"><span>Explore products</span><span>→</span></a></div></div>
+        </div>
+    </div>
+</div>
 {% else %}
-
-    <a href="{% url 'login' %}">Login</a>
-    <a href="{% url 'signup' %}">Signup</a>
-
+<section class="relative isolate overflow-hidden">
+    <div class="hero-grid absolute inset-0 -z-10"></div><div data-parallax="-.08" class="parallax absolute -right-32 top-20 -z-10 h-96 w-96 rounded-full bg-brand-100/60 blur-3xl"></div><div data-parallax=".04" class="parallax absolute -left-40 top-72 -z-10 h-80 w-80 rounded-full bg-indigo-100/60 blur-3xl"></div>
+    <div class="mx-auto grid max-w-[1440px] items-center gap-14 px-5 pb-20 pt-16 lg:grid-cols-[.95fr_1.05fr] lg:px-16 lg:pb-32 lg:pt-28">
+        <div class="animate-in"><div class="mb-7 inline-flex items-center gap-2 rounded-full border border-brand-100 bg-white/80 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-brand-700 shadow-sm"><span class="h-2 w-2 rounded-full bg-emerald-500"></span>The modern billing workspace</div><h1 class="max-w-2xl font-display text-5xl font-extrabold leading-[1.06] tracking-[-.04em] text-ink sm:text-6xl lg:text-7xl">Manage subscriptions, billing and payments <span class="text-brand-600">in one place.</span></h1><p class="mt-7 max-w-xl text-lg leading-8 text-slate-600">Brightloop gives growing teams a simple, powerful way to run recurring revenue and deliver a better customer experience.</p><div class="mt-9 flex flex-wrap gap-3"><a href="{% url 'signup' %}" class="rounded-xl bg-ink px-5 py-3.5 font-semibold text-white shadow-xl shadow-slate-900/10 transition hover:-translate-y-0.5 hover:bg-slate-700">Get started <span class="ml-2">↗</span></a><a href="{% url 'login' %}" class="rounded-xl border border-slate-200 bg-white/90 px-5 py-3.5 font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300">Log in</a></div><div class="mt-8 flex items-center gap-4 text-xs font-semibold text-slate-500"><span>Built for clarity</span><span class="h-1 w-1 rounded-full bg-slate-300"></span><span>Ready to scale</span></div></div>
+        <div data-parallax="-.025" class="parallax animate-in delay-2 relative"><div class="absolute -inset-5 rounded-[2rem] bg-brand-200/30 blur-2xl"></div><div class="relative overflow-hidden rounded-3xl border border-white/10 bg-[#111827] p-3 shadow-2xl shadow-slate-900/20 sm:p-4"><div class="flex items-center gap-2 border-b border-white/10 px-3 pb-4"><span class="h-2.5 w-2.5 rounded-full bg-rose-400"></span><span class="h-2.5 w-2.5 rounded-full bg-amber-300"></span><span class="h-2.5 w-2.5 rounded-full bg-emerald-400"></span><span class="ml-3 text-xs text-slate-500">app.brightloop.io</span></div><div class="grid grid-cols-[116px_1fr] gap-4 p-3 sm:grid-cols-[150px_1fr] sm:p-5"><div class="hidden space-y-2 border-r border-white/10 pr-4 sm:block"><div class="mb-6 h-5 w-20 rounded bg-white/15"></div><div class="h-7 rounded-lg bg-brand-500/30"></div><div class="h-7 rounded-lg bg-white/5"></div><div class="h-7 rounded-lg bg-white/5"></div><div class="h-7 rounded-lg bg-white/5"></div></div><div><div class="flex items-center justify-between"><div><div class="h-3 w-24 rounded bg-white/20"></div><div class="mt-2 h-6 w-40 rounded bg-white/80"></div></div><div class="h-8 w-8 rounded-full bg-brand-500/40"></div></div><div class="mt-7 grid gap-3 sm:grid-cols-3"><div class="rounded-xl bg-white/10 p-3"><div class="h-2 w-14 rounded bg-white/30"></div><div class="mt-3 h-6 w-16 rounded bg-white/80"></div><div class="mt-2 h-2 w-10 rounded bg-emerald-300/60"></div></div><div class="rounded-xl bg-white/10 p-3"><div class="h-2 w-12 rounded bg-white/30"></div><div class="mt-3 h-6 w-20 rounded bg-white/80"></div><div class="mt-2 h-2 w-12 rounded bg-white/15"></div></div><div class="rounded-xl bg-white/10 p-3"><div class="h-2 w-16 rounded bg-white/30"></div><div class="mt-3 h-6 w-12 rounded bg-white/80"></div><div class="mt-2 h-2 w-9 rounded bg-white/15"></div></div></div><div class="mt-4 h-36 rounded-xl border border-white/10 bg-white/5 p-4"><div class="h-2 w-24 rounded bg-white/20"></div><div class="mt-7 flex h-16 items-end gap-2"><span class="h-6 flex-1 rounded-t bg-brand-500/40"></span><span class="h-10 flex-1 rounded-t bg-brand-500/60"></span><span class="h-8 flex-1 rounded-t bg-brand-500/50"></span><span class="h-14 flex-1 rounded-t bg-brand-500"></span><span class="h-11 flex-1 rounded-t bg-brand-500/70"></span><span class="h-16 flex-1 rounded-t bg-brand-400"></span></div></div></div></div></div></div>
+    </div>
+</section>
+<section class="mx-auto max-w-[1440px] px-5 pb-20 lg:px-16"><div class="grid gap-4 border-t border-slate-200 pt-8 text-sm text-slate-500 sm:grid-cols-3"><div><div class="mb-3 text-2xl font-bold text-ink">One source of truth</div>Keep plans, payments, and customers connected.</div><div><div class="mb-3 text-2xl font-bold text-ink">Built for momentum</div>Spend less time in spreadsheets and more time growing.</div><div><div class="mb-3 text-2xl font-bold text-ink">Clear by default</div>Give customers a billing experience they trust.</div></div></section>
 {% endif %}
-
-</body>
-</html>
+{% endblock %}

@@ -1,25 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-</head>
-
-<body>
-
-<h2>Login</h2>
-
-<form method="POST">
-    {% csrf_token %}
-
-    {{ form.as_p }}
-
-    <button type="submit">Login</button>
-</form>
-
-<a href="{% url 'signup' %}">Create account</a>
-<a href="{% url 'password_reset' %}">
-    Forgot Password?
-</a>
-
-</body>
-</html>
+{% extends "accounts/base.html" %}
+{% block title %}Log in | Brightloop{% endblock %}
+{% block content %}
+<section class="relative isolate flex min-h-[calc(100vh-74px)] items-center overflow-hidden px-5 py-12">
+    <div class="hero-grid absolute inset-0 -z-10 opacity-70"></div><div class="absolute -right-32 top-20 -z-10 h-80 w-80 rounded-full bg-brand-100/70 blur-3xl"></div>
+    <div class="mx-auto grid w-full max-w-5xl items-center gap-12 lg:grid-cols-[.8fr_1fr]">
+        <div class="hidden lg:block"><p class="text-sm font-bold uppercase tracking-[.18em] text-brand-600">Welcome to Brightloop</p><h1 class="mt-4 max-w-md font-display text-5xl font-extrabold leading-tight tracking-[-.04em] text-ink">Your business, in a better loop.</h1><p class="mt-5 max-w-sm leading-7 text-slate-500">A calm, connected workspace for subscriptions, billing, and customer relationships.</p><div class="mt-8 flex items-center gap-3 text-sm font-semibold text-slate-600"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">✓</span>Secure by design</div></div>
+        <div class="mx-auto w-full max-w-md animate-in"><div class="mb-8 text-center lg:text-left"><div class="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-ink text-lg font-bold text-white lg:mx-0">B<span class="text-brand-500">.</span></div><h1 class="font-display text-3xl font-bold tracking-tight text-ink">Welcome back</h1><p class="mt-2 text-slate-500">Log in to continue to your Brightloop workspace.</p></div>
+            <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-soft sm:p-8"><form method="post" class="space-y-1">{% csrf_token %}{{ form.as_p }}<button type="submit" class="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-ink px-4 py-3.5 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-700">Log in <span>→</span></button></form><div class="mt-6 flex justify-between text-sm"><a href="{% url 'password_reset' %}" class="font-semibold text-brand-600 hover:text-brand-700">Forgot password?</a><a href="{% url 'signup' %}" class="font-semibold text-slate-700 hover:text-brand-600">Create account</a></div></div>
+        </div>
+    </div>
+</section>
+{% endblock %}
