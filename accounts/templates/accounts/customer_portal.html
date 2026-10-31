@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Customer Portal</title>
+</head>
+
+<body>
+
+<h1>Customer Portal</h1>
+
+<h2>Welcome, {{ user.name }}</h2>
+
+<p>Email: {{ user.email }}</p>
+
+<h3>My Subscriptions</h3>
+
+<p>Subscriptions will appear here.</p>
+
+<h3>My Invoices</h3>
+
+<p>Invoices will appear here.</p>
+
+<a href="{% url 'logout' %}">Logout</a>
+
+</body>
+</html>
