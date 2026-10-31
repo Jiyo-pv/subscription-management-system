@@ -6,8 +6,8 @@ from django.urls import reverse
 from django.utils import timezone
 
 from accounts.models import User
-from catalog.models import Plan, Product
-from subscriptions.models import Subscription
+from catalog.models import Discount, Plan, Product, Tax
+from subscriptions.models import Subscription, SubscriptionLine
 
 from .models import Invoice
 from .services import create_invoice_for_subscription
@@ -69,3 +69,22 @@ class InvoiceFlowTests(TestCase):
         response = self.client.get(reverse('invoice_create', args=[self.subscription.pk]))
         self.assertRedirects(response, reverse('subscription_detail', args=[self.subscription.pk]))
         self.assertFalse(Invoice.objects.exists())
+
+    def test_same_period_is_billed_only_once(self):
+        first = create_invoice_for_subscription(self.subscription)
+        second = create_invoice_for_subscription(self.subscription)
+        self.assertIsNotNone(first)
+        self.assertIsNone(second)
+        self.assertEqual(Invoice.objects.filter(subscription=self.subscription).count(), 1)
+
+    def test_invoice_applies_tax_and_discount_once(self):
+        tax = Tax.objects.create(name='GST', percent=Decimal('10.00'))
+        SubscriptionLine.objects.create(subscription=self.subscription, description='Service', product=self.plan.product, tax=tax, quantity=1, unit_price=Decimal('100.00'))
+        discount = Discount.objects.create(name='Launch', discount_type='percent', value=Decimal('10.00'))
+        invoice = create_invoice_for_subscription(self.subscription)
+        self.assertEqual(invoice.subtotal, Decimal('100.00'))
+        self.assertEqual(invoice.discount_total, Decimal('10.00'))
+        self.assertEqual(invoice.tax_total, Decimal('9.00'))
+        self.assertEqual(invoice.total, Decimal('99.00'))
+        discount.refresh_from_db()
+        self.assertEqual(discount.times_used, 1)

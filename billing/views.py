@@ -40,6 +40,9 @@ def invoice_create(request, subscription_pk):
     form = InvoiceCreateForm(request.POST or None)
     if request.method == 'POST' and form.is_valid():
         invoice = create_invoice_for_subscription(subscription, **form.cleaned_data)
+        if invoice is None:
+            messages.info(request, 'An invoice already exists for this billing period.')
+            return redirect('invoice_list')
         messages.success(request, f'Invoice {invoice.invoice_number} created.')
         return redirect('invoice_detail', pk=invoice.pk)
     return render(request, 'billing/invoice_form.html', {'form': form, 'subscription': subscription})

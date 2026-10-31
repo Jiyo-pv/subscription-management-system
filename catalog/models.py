@@ -85,6 +85,9 @@ class ProductVariant(models.Model):
         related_name='variants'
     )
     name = models.CharField(max_length=200)
+    attribute = models.CharField(max_length=100, blank=True)
+    value = models.CharField(max_length=100, blank=True)
+    extra_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     sales_price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -173,3 +176,40 @@ class Plan(models.Model):
     @property
     def billing_period_display(self):
         return dict(self.BILLING_PERIOD_CHOICES).get(self.billing_period, self.billing_period)
+
+
+class Tax(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    percent = models.DecimalField(max_digits=5, decimal_places=2)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f'{self.name} ({self.percent}%)'
+
+
+class Discount(models.Model):
+    FIXED = 'fixed'
+    PERCENT = 'percent'
+    PRODUCT = 'product'
+    SUBSCRIPTION = 'subscription'
+    TYPE_CHOICES = [(FIXED, 'Fixed amount'), (PERCENT, 'Percent')]
+    APPLY_TO_CHOICES = [(PRODUCT, 'Product'), (SUBSCRIPTION, 'Subscription')]
+
+    name = models.CharField(max_length=120, unique=True)
+    discount_type = models.CharField(max_length=10, choices=TYPE_CHOICES)
+    value = models.DecimalField(max_digits=12, decimal_places=2)
+    min_purchase = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    min_quantity = models.PositiveIntegerField(default=1)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+    usage_limit = models.PositiveIntegerField(null=True, blank=True)
+    times_used = models.PositiveIntegerField(default=0)
+    apply_to = models.CharField(max_length=20, choices=APPLY_TO_CHOICES, default=SUBSCRIPTION)
+    products = models.ManyToManyField(Product, blank=True, related_name='discounts')
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        indexes = [models.Index(fields=['is_active', 'start_date', 'end_date'])]
+
+    def __str__(self):
+        return self.name

@@ -173,8 +173,12 @@ class SubscriptionLine(models.Model):
         related_name='lines'
     )
     description = models.CharField(max_length=300)
+    product = models.ForeignKey('catalog.Product', on_delete=models.PROTECT, null=True, blank=True)
+    variant = models.ForeignKey('catalog.ProductVariant', on_delete=models.PROTECT, null=True, blank=True)
+    tax = models.ForeignKey('catalog.Tax', on_delete=models.PROTECT, null=True, blank=True)
     quantity = models.PositiveIntegerField(default=1)
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     history = HistoricalRecords()
@@ -184,4 +188,4 @@ class SubscriptionLine(models.Model):
 
     @property
     def line_total(self):
-        return self.quantity * self.unit_price
+        return self.amount or self.quantity * self.unit_price

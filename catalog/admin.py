@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, ProductVariant, Plan
+from .models import Discount, Product, ProductVariant, Plan, Tax
 
 
 @admin.register(Product)
@@ -48,3 +48,16 @@ class PlanAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+@admin.register(Tax)
+class TaxAdmin(admin.ModelAdmin):
+    list_display = ('name', 'percent', 'is_active')
+    list_filter = ('is_active',)
+
+
+@admin.register(Discount)
+class DiscountAdmin(admin.ModelAdmin):
+    list_display = ('name', 'discount_type', 'value', 'apply_to', 'times_used', 'usage_limit', 'is_active')
+    list_filter = ('discount_type', 'apply_to', 'is_active')
+    filter_horizontal = ('products',)

@@ -4,7 +4,8 @@ from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponse, JsonResponse
 from django.core.paginator import Paginator
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Sum
+from django.utils import timezone
 import time
 from .forms import SignupForm, StaffCreationForm, ProductOwnerCreationForm, CustomerProfileForm
 from .decorators import role_required
@@ -126,6 +127,7 @@ def home(request):
 def admin_dashboard(request):
     from catalog.models import Plan, Product
     from subscriptions.models import Subscription
+    from billing.models import Invoice
 
     subscription_counts = Subscription.objects.aggregate(
         total=Count('id'),
@@ -148,6 +150,9 @@ def admin_dashboard(request):
         'subscriptions_active': subscription_counts['active'],
         'subscriptions_pending': subscription_counts['pending'],
         'subscriptions_closed': subscription_counts['closed'],
+        'revenue': Invoice.objects.filter(status='paid').aggregate(total=Sum('amount_paid'))['total'] or 0,
+        'outstanding': Invoice.objects.filter(status='open').aggregate(total=Sum('total_amount'))['total'] or 0,
+        'overdue': Invoice.objects.filter(status='open', due_date__lt=timezone.localdate()).aggregate(total=Sum('total_amount'))['total'] or 0,
     }
     recent_subscriptions = Subscription.objects.select_related(
         'customer', 'plan'
@@ -175,6 +180,9 @@ def admin_dashboard(request):
         ('Total plans', stats['plans_total'], '◈', '/plans/'),
         ('Subscriptions', stats['subscriptions_total'], '◇', '/subscriptions/'),
         ('Active subscriptions', stats['subscriptions_active'], '↻', '/subscriptions/?status=active'),
+        ('Revenue received', f"${stats['revenue']}", '$', '/invoices/?status=paid'),
+        ('Outstanding invoices', f"${stats['outstanding']}", '▤', '/invoices/?status=open'),
+        ('Overdue invoices', f"${stats['overdue']}", '!', '/invoices/?status=open'),
     ]
     return render(request, 'accounts/admin_dashboard.html', {
         'stats': stats,

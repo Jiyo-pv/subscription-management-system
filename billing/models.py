@@ -22,9 +22,16 @@ class Invoice(models.Model):
     subscription = models.ForeignKey('subscriptions.Subscription', on_delete=models.PROTECT, related_name='invoices')
     customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='invoices')
     issue_date = models.DateField(default=timezone.localdate)
+    period_start = models.DateField(db_index=True, default=timezone.localdate)
+    period_end = models.DateField(default=timezone.localdate)
     due_date = models.DateField()
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=DRAFT)
     paid_at = models.DateTimeField(null=True, blank=True)
+    subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    discount_total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    tax_total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    amount_paid = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -33,6 +40,8 @@ class Invoice(models.Model):
 
     class Meta:
         ordering = ['-issue_date', '-id']
+        constraints = [models.UniqueConstraint(fields=['subscription', 'period_start'], name='unique_invoice_period')]
+        indexes = [models.Index(fields=['status', 'due_date'])]
 
     def __str__(self):
         return self.invoice_number
@@ -48,7 +57,7 @@ class Invoice(models.Model):
 
     @property
     def total(self):
-        return sum((line.line_total for line in self.lines.all()), Decimal('0.00'))
+        return self.total_amount
 
     @property
     def is_overdue(self):
@@ -61,16 +70,22 @@ class Invoice(models.Model):
         self.paid_at = timezone.now()
         self.save(update_fields=['status', 'paid_at', 'updated_at'])
 
+    @property
+    def balance_due(self):
+        return self.total_amount - self.amount_paid
+
 
 class InvoiceLine(models.Model):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='lines')
     description = models.CharField(max_length=300)
     quantity = models.PositiveIntegerField(default=1)
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    tax_percent = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     def __str__(self):
         return self.description
 
     @property
     def line_total(self):
-        return self.quantity * self.unit_price
+        return self.amount or self.quantity * self.unit_price
