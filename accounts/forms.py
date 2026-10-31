@@ -25,3 +25,4 @@ class SignupForm(UserCreationForm):
             )
 
         return email
+    
