@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from .forms import SignupForm
-
+from django.contrib.auth.decorators import login_required
+from .forms import SignupForm, StaffCreationForm
+from .decorators import role_required
 
 def signup(request):
 
@@ -55,3 +57,20 @@ from .decorators import role_required
 @role_required('admin')
 def admin_test(request):
     return HttpResponse("You are an ADMIN!")
+
+@role_required('admin')
+def create_staff(request):
+    if request.method == 'POST':
+        form = StaffCreationForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+    else:
+        form = StaffCreationForm()
+
+    return render(
+        request,
+        'accounts/create_staff.html',
+        {'form': form}
+    )

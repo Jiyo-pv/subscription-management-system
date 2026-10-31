@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Staff</title>
+</head>
+
+<body>
+
+<h2>Create Staff Account</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit">Create Staff</button>
+</form>
+
+<a href="{% url 'home' %}">Back to Home</a>
+
+</body>
+</html>

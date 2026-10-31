@@ -1,12 +1,9 @@
 from functools import wraps
-
 from django.core.exceptions import PermissionDenied
 
 
 def role_required(*roles):
-
     def decorator(view_func):
-
         @wraps(view_func)
         def wrapper(request, *args, **kwargs):
 

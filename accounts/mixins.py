@@ -3,12 +3,10 @@ from django.core.exceptions import PermissionDenied
 
 
 class RoleRequiredMixin(LoginRequiredMixin):
-
-    allowed_roles = []
+    roles = []
 
     def dispatch(self, request, *args, **kwargs):
-
-        if request.user.role not in self.allowed_roles:
+        if request.user.role not in self.roles:
             raise PermissionDenied
 
         return super().dispatch(request, *args, **kwargs)
