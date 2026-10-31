@@ -2,6 +2,7 @@ from datetime import date, timedelta
 from decimal import Decimal
 
 from django.test import TestCase
+from django.core.management import call_command
 from django.urls import reverse
 from django.utils import timezone
 
@@ -88,3 +89,15 @@ class InvoiceFlowTests(TestCase):
         self.assertEqual(invoice.total, Decimal('99.00'))
         discount.refresh_from_db()
         self.assertEqual(discount.times_used, 1)
+
+    def test_run_billing_is_idempotent_and_advances_date(self):
+        self.subscription.next_billing_date = date.today()
+        self.subscription.save()
+        call_command('run_billing')
+        self.assertEqual(Invoice.objects.filter(subscription=self.subscription).count(), 1)
+        self.subscription.refresh_from_db()
+        first_next_date = self.subscription.next_billing_date
+        call_command('run_billing')
+        self.assertEqual(Invoice.objects.filter(subscription=self.subscription).count(), 1)
+        self.subscription.refresh_from_db()
+        self.assertEqual(self.subscription.next_billing_date, first_next_date)
